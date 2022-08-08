@@ -2,7 +2,7 @@ Implemented by a user who wishes to remain anonymous<br/>
 Maintained by eXish<br/>
 <br/>
 ==Steam Workshop Link==<br/>
-https://steamcommunity.com/sharedfiles/filedetails/?id=2495307001<br/>
+https://steamcommunity.com/sharedfiles/filedetails/?id=2846268870<br/>
 <br/>
 ==Manual Links==<br/>
 HTML: https://ktane.timwi.de/HTML/Black.html or https://ktane.timwi.de/HTML/White.html<br/>
