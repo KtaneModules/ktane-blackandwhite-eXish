@@ -15,7 +15,7 @@ MonoBehaviour:
   title: Black and White
   author: eXish
   description: "Use the number of lit lights on White to determine how many times
-    to press the buttons on Black. These needies which will always spawn with each
+    to press the buttons on Black. These needies will always spawn with each
     other, and in order to do this requires the Tweaks mod.\n\nThis is a reuploaded
     item from a creator who wishes to remain anonymous.\n\nBlack (blackModule) v1.5.0\nWhite
     (whiteModule) v1.5.0\nMaintained by eXish\r\nTwitch Plays supported"
