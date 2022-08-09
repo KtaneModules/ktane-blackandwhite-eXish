@@ -224,7 +224,6 @@ public class BlackScript : BlackWhiteScript
 			}
 			yield return null;
 		}
-		yield break;
 	}
 
 	[SerializeField]
