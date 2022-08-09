@@ -30,7 +30,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &1015183657475334
 GameObject:
   m_ObjectHideFlags: 1
@@ -643,7 +643,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &1545524291045502
 GameObject:
   m_ObjectHideFlags: 1
@@ -669,6 +669,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4778984697893548}
   - component: {fileID: 114520422993756138}
+  - component: {fileID: 114569543818230096}
   m_Layer: 0
   m_Name: BlackWhiteService
   m_TagString: Untagged
@@ -3998,12 +3999,12 @@ MonoBehaviour:
   m_Script: {fileID: 1718998123, guid: 45b809be76fd7a3468b6f517bced6f28, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CountdownTime: 40
+  CountdownTime: 45
   ResetDelayMin: 10
   ResetDelayMax: 40
   ModuleType: blackModule
   ModuleDisplayName: Black
-  RequiresTimerVisibility: 0
+  RequiresTimerVisibility: 1
   WarnAtFiveSeconds: 1
 --- !u!114 &114127774309212200
 MonoBehaviour:
@@ -4266,7 +4267,7 @@ MonoBehaviour:
   Children: []
   IsPassThrough: 0
   ChildRowLength: 0
-  Highlight: {fileID: 0}
+  Highlight: {fileID: 114036543674081736}
   SelectableColliders:
   - {fileID: 65837375719820632}
   DefaultSelectableIndex: 0
@@ -4464,13 +4465,13 @@ MonoBehaviour:
   m_Script: {fileID: 1718998123, guid: 45b809be76fd7a3468b6f517bced6f28, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CountdownTime: 40
+  CountdownTime: 45
   ResetDelayMin: 10
   ResetDelayMax: 40
   ModuleType: whiteModule
   ModuleDisplayName: White
   RequiresTimerVisibility: 0
-  WarnAtFiveSeconds: 1
+  WarnAtFiveSeconds: 0
 --- !u!114 &114553763882419370
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -4533,6 +4534,17 @@ MonoBehaviour:
   AllowSelectionWrapY: 0
   ForceSelectionHighlight: 0
   ForceInteractionHighlight: 0
+--- !u!114 &114569543818230096
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1563462215332494}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1453678656, guid: 45b809be76fd7a3468b6f517bced6f28, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114576192319959566
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -4545,8 +4557,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _identifier: {fileID: 102043996118695438}
-  Partner: {fileID: 114709422286888702}
-  Module: {fileID: 114089799059524248}
+  Partner: {fileID: 0}
+  Module: {fileID: 0}
   _buttons:
   - {fileID: 114166747068019784}
   - {fileID: 114788997776154766}
@@ -4688,8 +4700,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _identifier: {fileID: 102728058095009788}
-  Partner: {fileID: 114576192319959566}
-  Module: {fileID: 114548746876696450}
+  Partner: {fileID: 0}
+  Module: {fileID: 0}
   Lights:
   - {fileID: 114414953341831140}
   - {fileID: 114349667684563426}

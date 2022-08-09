@@ -16,7 +16,7 @@ public class BlackScript : BlackWhiteScript
 
 	private new void Start()
 	{
-		Start();
+		base.Start();
 		for (int i = 0; i < _buttons.Length; i++)
 		{
 			int j = i;

@@ -30,14 +30,10 @@ public abstract class BlackWhiteScript : MonoBehaviour
 	{
 		Audio = GetComponent<KMAudio>();
 		Module = GetComponent<KMNeedyModule>();
-		KMNeedyModule module = Module;
-		module.OnActivate = (KMNeedyModule.KMModuleActivateEvent)Delegate.Combine(module.OnActivate, new KMNeedyModule.KMModuleActivateEvent(Activate));
-		KMNeedyModule module2 = Module;
-		module2.OnNeedyActivation = (KMNeedyModule.KMNeedyActivationEvent)Delegate.Combine(module2.OnNeedyActivation, new KMNeedyModule.KMNeedyActivationEvent(NeedyStart));
-		KMNeedyModule module3 = Module;
-		module3.OnTimerExpired = (KMNeedyModule.KMTimerExpiredEvent)Delegate.Combine(module3.OnTimerExpired, new KMNeedyModule.KMTimerExpiredEvent(NeedyEnd));
-		KMNeedyModule module4 = Module;
-		module4.OnNeedyDeactivation = (KMNeedyModule.KMNeedyDeactivationEvent)Delegate.Combine(module4.OnNeedyDeactivation, new KMNeedyModule.KMNeedyDeactivationEvent(BombOver));
+		Module.OnActivate += Activate;
+		Module.OnNeedyActivation += NeedyStart;
+		Module.OnTimerExpired += NeedyEnd;
+		Module.OnNeedyDeactivation += BombOver;
 		NeedyComponent = gameObject.GetComponent(ReflectionHelper.FindTypeInGame("ModNeedyComponent"));
 	}
 
