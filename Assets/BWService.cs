@@ -102,7 +102,7 @@ public class BWService : MonoBehaviour
 		HarmonyMethod harmonyMethod3 = new HarmonyMethod(GetType().Method("CountModsPostfix"));
 		harmony.Patch(methodBase, harmonyMethod, harmonyMethod3, null, null);
 		Debug.Log("[Black and White] Count Mods okay");
-		type = ReflectionHelper.FindType("BetterCasePicker");
+		type = ReflectionHelper.FindType("BetterCasePicker", "TweaksAssembly");
 		if (type != null)
 		{
 			type = type.GetNestedType("<>c", ReflectionHelper.Flags);
