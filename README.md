@@ -1,4 +1,4 @@
-Module by BakersDozenBagels<br/>
+Modules by BakersDozenBagels<br/>
 Maintained by eXish<br/>
 <br/>
 ==Steam Workshop Link==<br/>
