@@ -471,7 +471,7 @@ public class TestHarness : MonoBehaviour
     bool gamepadEnabled = false;
     TestSelectable lastSelected;
 
-    private Transform AudioSourceTransforms;
+    AudioSource audioSource;
     [Range(0.0f, 1.0f)] public float AudioVolume = 0.25f;
     public List<AudioClip> AudioClips;
     public Dictionary<KMSoundOverride.SoundEffect, AudioSource> GameSoundEffectSources = new Dictionary<KMSoundOverride.SoundEffect, AudioSource>();
@@ -546,12 +546,8 @@ public class TestHarness : MonoBehaviour
         NeedyModules = FindObjectsOfType<KMNeedyModule>().ToList();
         var allModules = Modules.ToArray().Concat<Component>(NeedyModules.ToArray());
         foreach (Component moduleComponent in allModules)
-        {
-            if(moduleComponent is KMBombModule)
-		        fakeInfo.modules.Add(new KeyValuePair<KMBombModule, bool>((KMBombModule)moduleComponent, false));
             Handlers(moduleComponent.GetComponent<KMBombInfo>());
-        }
-        fakeInfo.needyModules = NeedyModules.ToList();
+
         ReplaceBombInfo();
         AddHighlightables();
         AddSelectables();
@@ -1058,12 +1054,14 @@ public class TestHarness : MonoBehaviour
         PrepareBomb(modules, needyModules, ref fakeInfo.widgets);
 
         fakeInfo.TimerModule = _timer;
+        fakeInfo.needyModules = needyModules.ToList();
         UpdateRoot(GetComponent<TestSelectable>());
         for (int i = 0; i < modules.Count; i++)
         {
             KMBombModule mod = modules[i];
             StatusLight statuslight = CreateStatusLight(mod.transform);
 
+            fakeInfo.modules.Add(new KeyValuePair<KMBombModule, bool>(modules[i], false));
             modules[i].OnPass = delegate ()
             {
                 KeyValuePair<KMBombModule, bool> kvp = fakeInfo.modules.First(t => t.Key.Equals(mod));
@@ -1125,10 +1123,13 @@ public class TestHarness : MonoBehaviour
 
         currentSelectable.ActivateChildSelectableAreas();
 
-        AudioSourceTransforms = new GameObject().transform;
-        AudioSourceTransforms.name = "Audio Sources";
-        AudioSourceTransforms.parent = transform;
-        
+        Transform audioSouceTransforms = new GameObject().transform;
+        audioSouceTransforms.name = "Audio Sources";
+        audioSouceTransforms.parent = transform;
+
+        audioSource = new GameObject().AddComponent<AudioSource>();
+        audioSource.transform.name = "PlaySoundHandler";
+        audioSource.transform.parent = audioSouceTransforms;
         KMAudio[] kmAudios = FindObjectsOfType<KMAudio>();
         foreach (KMAudio kmAudio in kmAudios)
         {
@@ -1144,7 +1145,7 @@ public class TestHarness : MonoBehaviour
         {
             AudioSource effectAudioSource = new GameObject().AddComponent<AudioSource>();
             effectAudioSource.transform.name = "SoundEffect." + effect;
-            effectAudioSource.transform.parent = AudioSourceTransforms;
+            effectAudioSource.transform.parent = audioSouceTransforms;
             effectAudioSource.loop = effect == KMSoundOverride.SoundEffect.NeedyWarning ||
                                      effect == KMSoundOverride.SoundEffect.AlarmClockBeep;
 
@@ -1160,30 +1161,16 @@ public class TestHarness : MonoBehaviour
         }
     }
 
-
-    private IEnumerator DestroyAudioSource(AudioSource source, float length)
-    {
-        yield return new WaitForSecondsRealtime(length);
-        try
-        {
-            Destroy(source.gameObject);
-        }
-        catch (MissingReferenceException) {}
-    }
-
     protected void PlaySoundHandler(string clipName, Transform t)
     {
         AudioClip clip = AudioClips == null ? null : AudioClips.FirstOrDefault(a => a.name == clipName);
+
         if (clip != null)
         {
-            var audioSource = new GameObject().AddComponent<AudioSource>();
-            audioSource.transform.parent = AudioSourceTransforms;
-            audioSource.transform.name = clipName;
             audioSource.volume = AudioVolume;
             audioSource.loop = false;
             audioSource.transform.position = t.position;
             audioSource.PlayOneShot(clip);
-            StartCoroutine(DestroyAudioSource(audioSource, clip.length));
         }
         else
             Debug.Log("Audio clip not found: " + clipName);
@@ -1197,25 +1184,12 @@ public class TestHarness : MonoBehaviour
 
         if (clip != null)
         {
-            var audioSource = new GameObject().AddComponent<AudioSource>();
-            audioSource.transform.parent = AudioSourceTransforms;
-            audioSource.transform.name = clipName;
             audioSource.volume = AudioVolume;
             audioSource.transform.position = t.position;
             audioSource.loop = loop;
             audioSource.clip = clip;
             audioSource.Play();
-            audioRef.StopSound = () =>
-            {
-                try
-                {
-                    audioSource.Stop();
-                    Destroy(audioSource.gameObject);
-                }
-                catch (MissingReferenceException) { }
-            };
-            if(!loop)
-                StartCoroutine(DestroyAudioSource(audioSource, clip.length));
+            audioRef.StopSound = () => { audioSource.Stop(); };
         }
         else
             Debug.Log("Audio clip not found: " + clipName);

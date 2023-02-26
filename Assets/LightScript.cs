@@ -2,38 +2,33 @@
 
 public class LightScript : MonoBehaviour
 {
-	private void Awake()
-	{
-		_bulb.sharedMaterial = new Material(_bulb.sharedMaterial);
-		transform.localEulerAngles = new Vector3(0f, Random.Range(0f, 360f), 0f);
-		_filament.transform.localEulerAngles = new Vector3(0f, Random.Range(0f, 360f), 0f);
-		Off();
-	}
+    [SerializeField]
+    private Light _light;
+    [SerializeField]
+    private Renderer _bulb;
+    [SerializeField]
+    private Transform _filament;
+    [SerializeField]
+    private Texture _onTex, _offTex;
 
-	public void On()
-	{
-		_light.enabled = true;
-		_bulb.material.mainTexture = _onTex;
-	}
+    private void Awake()
+    {
+        _bulb.sharedMaterial = new Material(_bulb.sharedMaterial);
 
-	public void Off()
-	{
-		_light.enabled = false;
-		_bulb.material.mainTexture = _offTex;
-	}
+        transform.localEulerAngles = new Vector3(0f, Random.Range(0f, 360f), 0f);
+        _filament.transform.localEulerAngles = new Vector3(0f, Random.Range(0f, 360f), 0f);
+        Off();
+    }
 
-	[SerializeField]
-	private Light _light;
+    public void On()
+    {
+        _light.enabled = true;
+        _bulb.material.mainTexture = _onTex;
+    }
 
-	[SerializeField]
-	private Renderer _bulb;
-
-	[SerializeField]
-	private Transform _filament;
-
-	[SerializeField]
-	private Texture _onTex;
-
-	[SerializeField]
-	private Texture _offTex;
+    public void Off()
+    {
+        _light.enabled = false;
+        _bulb.material.mainTexture = _offTex;
+    }
 }

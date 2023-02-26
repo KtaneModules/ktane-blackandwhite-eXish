@@ -3,269 +3,204 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using RNG = UnityEngine.Random;
 
 public class BlackScript : BlackWhiteScript
 {
-	protected override string Name
-	{
-		get
-		{
-			return "Black";
-		}
-	}
+    [SerializeField]
+    private KMSelectable[] _buttons;
 
-	private new void Start()
-	{
-		base.Start();
-		for (int i = 0; i < _buttons.Length; i++)
-		{
-			int j = i;
-			KMSelectable kmselectable = _buttons[j];
-			kmselectable.OnInteract = (KMSelectable.OnInteractHandler)Delegate.Combine(kmselectable.OnInteract, new KMSelectable.OnInteractHandler(delegate()
-			{
-				Press(j);
-				return false;
-			}));
-		}
-	}
+    protected override string Name { get { return "Black"; } }
 
-	private void Press(int j)
-	{
-		if (Errored)
-		{
-			return;
-		}
-		Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, _buttons[j].transform);
-		_buttons[j].AddInteractionPunch(0.1f);
-		if (!IsActive)
-		{
-			return;
-		}
-		_requiredPresses[j]--;
-		if (_requiredPresses[j] < 0)
-		{
-			Log("You pressed button {0} one too many times. Strike!", new object[]
-			{
-				j + 1
-			});
-			Module.HandleStrike();
-			IsActive = false;
-			LightsOff();
-			Module.HandlePass();
-			Partner.Module.HandlePass();
-			return;
-		}
-		if (_requiredPresses.All((int i) => i == 0))
-		{
-			Log("All buttons pressed correctly. Disarmed, for now...", new object[0]);
-			IsActive = false;
-			LightsOff();
-			Module.HandlePass();
-			Partner.Module.HandlePass();
-		}
-	}
+    public bool IsActive;
 
-	protected override void NeedyEnd()
-	{
-		Log("Time ran out. You needed to press the buttons this many more times: {0}", new object[]
-		{
-			_requiredPresses.Join(" ")
-		});
-		Module.HandleStrike();
-		IsActive = false;
-		LightsOff();
-		Module.HandlePass();
-		Partner.Module.HandlePass();
-	}
+    private int[][] _quadrants = new int[][]
+    {
+        new int[] { 0, 1, 3, 4 },
+        new int[] { 1, 2, 4, 5 },
+        new int[] { 3, 4, 6, 7 },
+        new int[] { 4, 5, 7, 8 }
+    };
+    private int[] _requiredPresses = new int[4];
 
-	protected override void NeedyStart()
-	{
-		if (Partner == null)
-		{
-			Module.HandlePass();
-			return;
-		}
-		IsActive = true;
-		WhiteScript whiteScript = (WhiteScript)Partner;
-		List<bool> list = (from i in Enumerable.Repeat<int>(0, 8)
-		select UnityEngine.Random.Range(0, 2) == 1).ToList<bool>();
-		list.Insert(UnityEngine.Random.Range(0, 8), true);
-		for (int l = 0; l < 9; l++)
-		{
-			if (list[l])
-			{
-				whiteScript.Lights[l].On();
-			}
-			else
-			{
-				whiteScript.Lights[l].Off();
-			}
-		}
-		for (int j = 0; j < _quadrants.Length; j++)
-		{
-			_requiredPresses[j] = 0;
-			foreach (int index in _quadrants[j])
-			{
-				if (list[index])
-				{
-					_requiredPresses[j]++;
-				}
-			}
-		}
-		BWService.ActivateNeedy(Partner.NeedyComponent);
-		string message = "Module activated! Linked white displayed {0}. Correct press counts are {1}.";
-		object[] array2 = new object[2];
-		array2[0] = (from b in list
-		select (!b) ? "-" : "o").Join(string.Empty);
-		array2[1] = _requiredPresses.Join(" ");
-		Log(message, array2);
-		Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.NeedyActivated, transform);
-	}
+    private new void Start()
+    {
+        base.Start();
+        for(int i = 0; i < _buttons.Length; i++)
+        {
+            int j = i;
+            _buttons[j].OnInteract += () => { Press(j); return false; };
+        }
+    }
 
-	private void Update()
-	{
-		if (!IsActive || Errored)
-		{
-			return;
-		}
-		Partner.Module.SetNeedyTimeRemaining(Module.GetNeedyTimeRemaining());
-	}
+    private void Press(int j)
+    {
+        if(Errored)
+            return;
 
-	private void LightsOff()
-	{
-		if (Errored)
-		{
-			return;
-		}
-		WhiteScript whiteScript = (WhiteScript)Partner;
-		foreach (LightScript lightScript in whiteScript.Lights)
-		{
-			lightScript.Off();
-		}
-	}
+        Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, _buttons[j].transform);
+        _buttons[j].AddInteractionPunch(0.1f);
 
-	protected override void Activate()
-	{
-		if (Partner != null)
-		{
-			return;
-		}
-		WhiteScript[] componentsInChildren = transform.root.GetComponentsInChildren<WhiteScript>();
-		WhiteScript whiteScript = componentsInChildren.FirstOrDefault((WhiteScript ws) => ws.Partner == null);
-		if (whiteScript == null)
-		{
-			Error();
-			Log("Not enough Whites spawned!", new object[0]);
-			return;
-		}
-		Partner = whiteScript;
-		whiteScript.Partner = this;
-		if (componentsInChildren.Length > 1)
-		{
-			SetIdentifier(++Identifier);
-			Partner.SetIdentifier(Identifier);
-		}
-	}
+        if(!IsActive)
+            return;
 
-	protected override void BombOver()
-	{
-		IsActive = false;
-		LightsOff();
-	}
+        _requiredPresses[j]--;
+        if(_requiredPresses[j] < 0)
+        {
+            Log("You pressed button {0} one too many times. Strike!", j + 1);
+            Module.HandleStrike();
+            IsActive = false;
+            LightsOff();
+            Module.HandlePass();
+            Partner.Module.HandlePass();
+            return;
+        }
+        if(_requiredPresses.All(i => i == 0))
+        {
+            Log("All buttons pressed correctly. Disarmed, for now...");
+            IsActive = false;
+            LightsOff();
+            Module.HandlePass();
+            Partner.Module.HandlePass();
+        }
+    }
 
-	private IEnumerator ProcessTwitchCommand(string command)
-	{
-		if (Errored)
-		{
-			yield break;
-		}
-		command = command.Trim();
-		if (command.All((char c) => validChars.Contains(c) || char.IsWhiteSpace(c)))
-		{
-			if (command.Any((char c) => validChars.Contains(c)))
-			{
-				yield return null;
-				foreach (char c2 in command)
-				{
-					switch (c2)
-					{
-					case '1':
-					case '2':
-					case '3':
-					case '4':
-						_buttons[int.Parse(c2.ToString()) - 1].OnInteract.Invoke();
-						yield return new WaitForSeconds(0.1f);
-						break;
-					}
-				}
-			}
-		}
-		yield break;
-	}
+    protected override void NeedyEnd()
+    {
+        Log("Time ran out. You needed to press the buttons this many more times: {0}", _requiredPresses.Join(" "));
+        Module.HandleStrike();
+        IsActive = false;
+        LightsOff();
+        Module.HandlePass();
+        Partner.Module.HandlePass();
+    }
 
-	private void TwitchHandleForcedSolve()
-	{
-		if (Errored)
-		{
-			return;
-		}
-		StartCoroutine(AutoSolve());
-	}
+    protected override void NeedyStart()
+    {
+        if(Partner == null)
+        {
+            Module.HandlePass();
+            return;
+        }
 
-	private IEnumerator AutoSolve()
-	{
-		IEnumerable<int> buttons = Enumerable.Range(0, 4);
-		for (;;)
-		{
-			while (IsActive)
-			{
-				_buttons[buttons.First((int i) => _requiredPresses[i] != 0)].OnInteract.Invoke();
-				yield return new WaitForSeconds(0.1f);
-			}
-			yield return null;
-		}
-	}
+        IsActive = true;
 
-	[SerializeField]
-	private KMSelectable[] _buttons;
+        WhiteScript w = (WhiteScript)Partner;
+        List<bool> lights = Enumerable.Repeat(0, 8).Select(i => RNG.Range(0, 2) == 1).ToList();
+        lights.Insert(RNG.Range(0, 8), true);
+        for(int i = 0; i < 9; i++)
+        {
+            if(lights[i])
+                w.Lights[i].On();
+            else
+                w.Lights[i].Off();
+        }
 
-	public bool IsActive;
+        for(int i = 0; i < _quadrants.Length; i++)
+        {
+            _requiredPresses[i] = 0;
+            foreach(int j in _quadrants[i])
+                if(lights[j])
+                    _requiredPresses[i]++;
+        }
 
-	private int[][] _quadrants = new int[][]
-	{
-		new int[]
-		{
-			0,
-			1,
-			3,
-			4
-		},
-		new int[]
-		{
-			1,
-			2,
-			4,
-			5
-		},
-		new int[]
-		{
-			3,
-			4,
-			6,
-			7
-		},
-		new int[]
-		{
-			4,
-			5,
-			7,
-			8
-		}
-	};
+        BWService.ActivateNeedy(Partner.NeedyComponent);
 
-	private int[] _requiredPresses = new int[4];
+        Log("Module activated! Linked white displayed {0}. Correct press counts are {1}.", lights.Select(b => b ? "o" : "-").Join(""), _requiredPresses.Join(" "));
 
-    private readonly string TwitchHelpMessage = "Use \"!{0} 1 123 34\" to press those buttons. Buttons are numbered in reading order.";
+        Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.NeedyActivated, transform);
+    }
+
+    private void Update()
+    {
+        if(!IsActive || Errored)
+            return;
+        Partner.Module.SetNeedyTimeRemaining(Module.GetNeedyTimeRemaining());
+    }
+
+    private void LightsOff()
+    {
+        if(Errored)
+            return;
+        WhiteScript w = (WhiteScript)Partner;
+        foreach(LightScript l in w.Lights)
+            l.Off();
+    }
+
+    protected override void Activate()
+    {
+        if(Partner != null)
+            return;
+        WhiteScript[] allw = transform.root.GetComponentsInChildren<WhiteScript>();
+        WhiteScript w = allw.FirstOrDefault(ws => ws.Partner == null);
+        if(w == null)
+        {
+            Error();
+            Log("Not enough Whites spawned!");
+            return;
+            //throw new Exception("Not enough Whites spawned!");
+        }
+        Partner = w;
+        w.Partner = this;
+
+        if(allw.Length > 1)
+        {
+            SetIdentifier(++Identifier);
+            Partner.SetIdentifier(Identifier);
+        }
+    }
+
+    protected override void BombOver()
+    {
+        IsActive = false;
+        LightsOff();
+    }
+
+    private readonly string TwitchHelpMessage = @"Use ""!{0} 1 123 34"" to press those buttons. Buttons are numbered in reading order.";
 
     private static readonly string validChars = "1234";
+    private IEnumerator ProcessTwitchCommand(string command)
+    {
+        if(Errored)
+            yield break;
+        command = command.Trim();
+        if(command.All(c => validChars.Contains(c) || char.IsWhiteSpace(c)) && command.Any(c => validChars.Contains(c)))
+        {
+            yield return null;
+            foreach(char c in command)
+            {
+                switch(c)
+                {
+                    case '1':
+                    case '2':
+                    case '3':
+                    case '4':
+                        _buttons[int.Parse(c.ToString()) - 1].OnInteract();
+                        yield return new WaitForSeconds(0.1f);
+                        break;
+                }
+            }
+        }
+    }
+
+    private void TwitchHandleForcedSolve()
+    {
+        if(Errored)
+            return;
+        StartCoroutine(AutoSolve());
+    }
+
+    private IEnumerator AutoSolve()
+    {
+        IEnumerable<int> buttons = Enumerable.Range(0, 4);
+        while(true)
+        {
+            while(IsActive)
+            {
+                _buttons[buttons.First(i => _requiredPresses[i] != 0)].OnInteract();
+                yield return new WaitForSeconds(0.1f);
+            }
+            yield return null;
+        }
+    }
 }
