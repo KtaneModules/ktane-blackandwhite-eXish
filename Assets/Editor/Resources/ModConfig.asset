@@ -19,7 +19,7 @@ MonoBehaviour:
     and in order to do this requires the Tweaks mod.\n\nHTML: https://ktane.timwi.de/HTML/Black.html
     or https://ktane.timwi.de/HTML/White.html\r\nPDF: https://ktane.timwi.de/PDF/Black.pdf
     or https://ktane.timwi.de/PDF/White.pdf\n\nBlack (blackModule) v1.5.3\nWhite (whiteModule)
-    v1.5.3\nModules by BakersDozenBagels, maintained by eXish\r\nTwitch Plays supported"
+    v1.5.3\nModules by Anonymous, maintained by eXish\r\nTwitch Plays supported"
   version: 1.5.3
   outputFolder: build
   previewImage: {fileID: 2800000, guid: 9ab4fc2b9863d82469613d9c59f52174, type: 3}
