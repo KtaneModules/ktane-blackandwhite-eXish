@@ -115,7 +115,7 @@ public class BWService : MonoBehaviour
         Debug.Log("[Black and White] Count Mods okay");
 
         //Tweaks doesn't use the method above, and counts modules itself
-        t = ReflectionHelper.FindType("BetterCasePicker", "TweaksAssembly");
+        t = ReflectionHelper.FindTypeInTweaks("BetterCasePicker");
         if(t != null)
         {
             //We technically modify a nested type auto-generated for a lambda expression.
@@ -142,9 +142,10 @@ public class BWService : MonoBehaviour
         Debug.Log("[Black and White] Needy Activate okay");
 
         //DBML should never make a fake module for Black or White
-        t = ReflectionHelper.FindType("Repository");
+        t = ReflectionHelper.FindTypeInTweaks("Repository");
         if(t != null)
         {
+            // TODO: fix
             t = t.GetNestedType("\u003CLoadData\u003Ed__3", ReflectionHelper.Flags);
             if(t != null)
             {
@@ -161,7 +162,7 @@ public class BWService : MonoBehaviour
 
 
         //Tweaks needs to only know about Black's module id
-        t = ReflectionHelper.FindType("Repository");
+        t = ReflectionHelper.FindTypeInTweaks("Repository");
         if(t != null)
         {
             StartCoroutine(TweaksRepoFix());
@@ -185,7 +186,7 @@ public class BWService : MonoBehaviour
         //Debug.Log("[Black and White] Mod Manger Fix 2 okay");
 
         //Tweaks generates bombs itself, so we need to generate Whites on the back here as well.
-        t = ReflectionHelper.FindType("DemandBasedLoading");
+        t = ReflectionHelper.FindTypeInTweaks("DemandBasedLoading");
         if(t != null)
         {
             t = t.GetNestedType("\u003CInstantiateComponents\u003Ed__25", ReflectionHelper.Flags);
@@ -262,9 +263,8 @@ public class BWService : MonoBehaviour
 
     private IEnumerator TweaksRepoFix()
     {
-        Type t = ReflectionHelper.FindType("Repository");
+        Type t = ReflectionHelper.FindTypeInTweaks("Repository");
         Type t2 = t.GetNestedType("KtaneModule", ReflectionHelper.Flags);
-        Type t3 = typeof(List<>).MakeGenericType(t2);
         FieldInfo fi = t2.GetField("SteamID", ReflectionHelper.Flags);
         FieldInfo fi2 = t2.GetField("ModuleID", ReflectionHelper.Flags);
         FieldInfo mfi = t.GetField("Modules", ReflectionHelper.Flags);
@@ -306,7 +306,7 @@ public class BWService : MonoBehaviour
         Debug.Log("[Black and White] Mod Available okay");
 
         //In case this loads before it's patched
-        t = ReflectionHelper.FindType("DemandBasedLoading");
+        t = ReflectionHelper.FindTypeInTweaks("DemandBasedLoading");
         if(t != null)
         {
             List<string> fm = t.Field<List<string>>("fakedModules", null);
@@ -398,7 +398,7 @@ public class BWService : MonoBehaviour
 
         int i = 0;
 
-        Type t = ReflectionHelper.FindType("Repository");
+        Type t = ReflectionHelper.FindTypeInTweaks("Repository");
         FieldInfo f = t.GetField("Loaded", ReflectionHelper.Flags);
 
         for(; i < instructions.Count; i++)
@@ -538,7 +538,7 @@ public class BWService : MonoBehaviour
 
     private static void ClearRepository()
     {
-        Type t = ReflectionHelper.FindType("Repository");
+        Type t = ReflectionHelper.FindTypeInTweaks("Repository");
         IList m = t.Field<IList>("Modules", null);
         t = t.GetNestedType("KtaneModule", ReflectionHelper.Flags);
         FieldInfo fi = t.GetField("ModuleID", ReflectionHelper.Flags);
