@@ -314,7 +314,7 @@ public class BWService : MonoBehaviour
             Debug.Log("[Black and White] Fake Modules Initial Remove okay");
         }
 
-        t = ReflectionHelper.FindType("BombGenerator");
+        t = ReflectionHelper.FindTypeInGame("BombGenerator");
         object instance = FindObjectOfType(t);
         if(instance != null)
         {
