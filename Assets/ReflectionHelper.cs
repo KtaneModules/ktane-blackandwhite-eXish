@@ -14,6 +14,13 @@ public static class ReflectionHelper
             return t.FullName.Equals(fullName);
         });
     }
+    public static Type FindTypeInTweaks(string fullName)
+    {
+        return TweaksAssembly.GetSafeTypes().FirstOrDefault(t =>
+        {
+            return t.FullName.Equals(fullName);
+        });
+    }
 
     public static Type FindType(string fullName, string assemblyName = null)
     {
@@ -81,6 +88,19 @@ public static class ReflectionHelper
             return _gameAssembly;
         }
     }
+    private static Assembly TweaksAssembly
+    {
+        get
+        {
+            if (_tweaksAssembly == null)
+            {
+                _tweaksAssembly = FindType("TweaksAPI").Assembly;
+            }
+
+            return _tweaksAssembly;
+        }
+    }
 
     private static Assembly _gameAssembly = null;
+    private static Assembly _tweaksAssembly = null;
 }
